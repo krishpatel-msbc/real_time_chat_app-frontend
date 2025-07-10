@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Real-Time Chat</title>
+  <title>Real-Time Chat - Login</title>
   <style>
     body {
       margin: 0;
@@ -10,155 +10,117 @@
       background-color: #f5f5f5;
     }
 
-    .chat-container {
-      width: 70vw;
-      height: 80vh;
+    .center-box {
+      width: 50vw;
+      height: 66vh;
       margin: 5vh auto;
       background: white;
       border-radius: 12px;
       border: 2px solid #ccc;
-      padding: 20px;
+      padding: 30px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       display: flex;
       flex-direction: column;
+      align-items: center;
+    }
+
+    .logo-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .logo-title img {
+      height: 40px;
+      margin-right: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
     }
 
     h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .receiver-section {
-      display: flex;
-      justify-content: space-between;
+      margin-top: 40px;
       margin-bottom: 10px;
     }
 
-    .receiver-section input {
-      width: 75%;
-      padding: 8px;
+    input {
+      width: 80%;
+      padding: 10px;
+      margin: 8px 0;
       border-radius: 6px;
       border: 1px solid #aaa;
     }
 
-    .receiver-section button {
-      width: 23%;
-      padding: 8px;
+    button {
+      width: 84%;
+      padding: 10px;
+      margin: 6px 0;
+      border: none;
       background-color: #4caf50;
       color: white;
-      border: none;
       border-radius: 6px;
       cursor: pointer;
     }
 
-    .chat-box {
-      flex: 1;
-      border: 1px solid #aaa;
-      padding: 10px;
-      border-radius: 6px;
-      overflow-y: auto;
-      margin-bottom: 10px;
-      background-color: #fafafa;
-    }
-
-    .chat-box div {
-      margin-bottom: 8px;
-    }
-
-    .input-section {
-      display: flex;
-      gap: 10px;
-    }
-
-    .input-section input {
-      flex: 1;
-      padding: 10px;
-      border-radius: 6px;
-      border: 1px solid #aaa;
-    }
-
-    .input-section button {
-      padding: 10px 20px;
-      background-color: #2196f3;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .input-section button:hover {
-      background-color: #1976d2;
+    button:hover {
+      background-color: #45a049;
     }
   </style>
 </head>
 <body>
-  <div class="chat-container">
-    <h2>Welcome to Real-Time Chat</h2>
-
-    <div class="receiver-section">
-      <input id="receiver" placeholder="Receiver's Username" />
-      <button onclick="loadMessages()">Load Messages</button>
+  <div class="center-box">
+    <div class="logo-title">
+      <img src="your-logo.png" alt="Logo" />
+      <h1>Real-Time.com</h1>
     </div>
 
-    <div class="receiver-section">
-      <button style="width: 100%;" onclick="connect()">Connect to Chat</button>
-    </div>
+    <h2>Login / Register</h2>
 
-    <div id="chatBox" class="chat-box"></div>
-
-    <div class="input-section">
-      <input id="msg" placeholder="Your message..." />
-      <button onclick="send()">Send</button>
-    </div>
+    <input id="username" placeholder="Username" />
+    <input id="password" placeholder="Password" type="password" />
+    <button onclick="login()">Login</button>
+    <button onclick="register()">Register</button>
   </div>
 
   <script>
-    const token = localStorage.getItem("token");
-    const username = localStorage.getItem("username");
-    let socket = null;
+    let token = "";
 
-    function connect() {
-      const receiver = document.getElementById("receiver").value;
-      if (!receiver) return alert("Please enter a receiver username.");
-
-      socket = new WebSocket(`ws://localhost:8000/ws/${username}?token=${token}`);
-
-      socket.onmessage = (e) => {
-        const data = JSON.parse(e.data);
-        const seenText = data.seen ? "(seen)" : "(unread)";
-        const messageElement = `<div><strong>${data.from}:</strong> ${data.message} <em>${seenText}</em></div>`;
-        document.getElementById("chatBox").innerHTML += messageElement;
-      };
-    }
-
-    function send() {
-      const receiver = document.getElementById("receiver").value;
-      const message = document.getElementById("msg").value;
-      if (!socket || socket.readyState !== WebSocket.OPEN) return alert("WebSocket is not connected.");
-
-      socket.send(JSON.stringify({ receiver, message }));
-      document.getElementById("msg").value = "";
-    }
-
-    async function loadMessages() {
-      const receiver = document.getElementById("receiver").value;
-      if (!receiver) return alert("Please enter a receiver username.");
-
-      const res = await fetch(`http://localhost:8000/messages/${receiver}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+    async function login() {
+      const res = await fetch("http://localhost:8000/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `username=${username.value}&password=${password.value}`
       });
 
-      const messages = await res.json();
-      document.getElementById("chatBox").innerHTML = "";
+      if (res.ok) {
+        const data = await res.json();
+        token = data.access_token;
+        localStorage.setItem("token", token);
+        localStorage.setItem("username", username.value);
+        window.location.href = "chat.html"; // redirect to chat page
+      } else {
+        alert("Login failed.");
+      }
+    }
 
-      messages.forEach(msg => {
-        const sender = msg.sender_id === username ? "You" : receiver;
-        const seenText = msg.seen ? "(seen)" : "(unread)";
-        const div = `<div><strong>${sender}:</strong> ${msg.content} <em>${seenText}</em></div>`;
-        document.getElementById("chatBox").innerHTML += div;
+    async function register() {
+      const res = await fetch("http://localhost:8000/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: username.value,
+          password: password.value
+        })
       });
+
+      if (res.ok) {
+        alert("Registered successfully. Now login.");
+      } else {
+        alert("Registration failed.");
+      }
     }
   </script>
 </body>
