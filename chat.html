@@ -151,8 +151,11 @@
 
   const token = localStorage.getItem("token");
 
-  async function loadUsers() {
-    const res = await fetch("http://localhost:8000/users", {
+  async function loadUsers(searchQuery = "") {
+    const url = new URL("http://localhost:8000/active_chats");
+    if (searchQuery) url.searchParams.append("search", searchQuery);
+
+    const res = await fetch(url.toString(), {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -167,25 +170,20 @@
     const list = document.getElementById("chatList");
     list.innerHTML = "";
 
-    users.forEach(user => {
+    users.forEach(username => {
       const div = document.createElement("div");
       div.className = "chat-item";
-      div.innerHTML = `<span>${user.username}</span>`;
+      div.innerHTML = `<span>${username}</span>`;
       div.onclick = () => {
-        window.location.href = `chatroom.html?user=${encodeURIComponent(user.username)}`;
+        window.location.href = `chatroom.html?user=${encodeURIComponent(username)}`;
       };
       list.appendChild(div);
     });
   }
 
   function search() {
-    const query = document.getElementById("searchInput").value.toLowerCase();
-    const items = document.querySelectorAll(".chat-item");
-
-    items.forEach(item => {
-      const username = item.innerText.toLowerCase();
-      item.style.display = username.includes(query) ? "block" : "none";
-    });
+    const query = document.getElementById("searchInput").value.trim();
+    loadUsers(query);
   }
 
   loadUsers();
