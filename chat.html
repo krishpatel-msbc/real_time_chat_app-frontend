@@ -2,164 +2,193 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Real-Time Chat</title>
+  <title>Chats</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg-color: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-color: #111827;
+      --input-bg: #ffffff;
+      --input-border: #d1d5db;
+      --button-bg: #10b981;
+      --button-hover: #059669;
+    }
+
+    body.dark {
+      --bg-color: #111827;
+      --card-bg: #1f2937;
+      --text-color: #f9fafb;
+      --input-bg: #374151;
+      --input-border: #4b5563;
+      --button-bg: #2563eb;
+      --button-hover: #1d4ed8;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      transition: 0.3s ease;
+      padding: 40px 20px;
     }
 
-    .chat-container {
-      width: 70vw;
-      height: 80vh;
-      margin: 5vh auto;
-      background: white;
-      border-radius: 12px;
-      border: 2px solid #ccc;
-      padding: 20px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    .toggle-mode {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: 2px solid var(--text-color);
+      color: var(--text-color);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .toggle-mode:hover {
+      background: var(--text-color);
+      color: var(--bg-color);
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      margin: 0 0 20px;
+      font-size: 28px;
+    }
+
+    .search-bar {
+      display: flex;
+      margin-bottom: 24px;
+    }
+
+    .search-bar input {
+      flex: 1;
+      padding: 12px;
+      font-size: 15px;
+      border: 1px solid var(--input-border);
+      border-radius: 10px 0 0 10px;
+      background: var(--input-bg);
+      color: var(--text-color);
+    }
+
+    .search-bar button {
+      padding: 12px 20px;
+      border: none;
+      background: var(--button-bg);
+      color: white;
+      font-size: 15px;
+      border-radius: 0 10px 10px 0;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .search-bar button:hover {
+      background: var(--button-hover);
+    }
+
+    .chat-list {
       display: flex;
       flex-direction: column;
+      gap: 16px;
     }
 
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .receiver-section {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-
-    .receiver-section input {
-      width: 75%;
-      padding: 8px;
-      border-radius: 6px;
-      border: 1px solid #aaa;
-    }
-
-    .receiver-section button {
-      width: 23%;
-      padding: 8px;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 6px;
+    .chat-item {
+      padding: 16px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
       cursor: pointer;
+      transition: 0.2s ease;
     }
 
-    .chat-box {
-      flex: 1;
-      border: 1px solid #aaa;
-      padding: 10px;
-      border-radius: 6px;
-      overflow-y: auto;
-      margin-bottom: 10px;
-      background-color: #fafafa;
-    }
-
-    .chat-box div {
-      margin-bottom: 8px;
-    }
-
-    .input-section {
-      display: flex;
-      gap: 10px;
-    }
-
-    .input-section input {
-      flex: 1;
-      padding: 10px;
-      border-radius: 6px;
-      border: 1px solid #aaa;
-    }
-
-    .input-section button {
-      padding: 10px 20px;
-      background-color: #2196f3;
+    .chat-item:hover {
+      background: var(--button-bg);
       color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
+      transform: translateY(-2px);
     }
 
-    .input-section button:hover {
-      background-color: #1976d2;
+    .chat-item span {
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
-  <div class="chat-container">
-    <h2>Welcome to Real-Time Chat</h2>
+  <button class="toggle-mode" onclick="toggleDarkMode()">Toggle Dark Mode</button>
 
-    <div class="receiver-section">
-      <input id="receiver" placeholder="Receiver's Username" />
-      <button onclick="loadMessages()">Load Messages</button>
+  <div class="container">
+    <h1>Chats</h1>
+
+    <div class="search-bar">
+      <input id="searchInput" placeholder="Search Username" />
+      <button onclick="search()">Search</button>
     </div>
 
-    <div class="receiver-section">
-      <button style="width: 100%;" onclick="connect()">Connect to Chat</button>
-    </div>
-
-    <div id="chatBox" class="chat-box"></div>
-
-    <div class="input-section">
-      <input id="msg" placeholder="Your message..." />
-      <button onclick="send()">Send</button>
+    <div id="chatList" class="chat-list">
+      <!-- Dynamically loaded chatrooms here -->
     </div>
   </div>
 
   <script>
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    }
+
     const token = localStorage.getItem("token");
-    const username = localStorage.getItem("username");
-    let socket = null;
 
-    function connect() {
-      const receiver = document.getElementById("receiver").value;
-      if (!receiver) return alert("Please enter a receiver username.");
-
-      socket = new WebSocket(`ws://localhost:8000/ws/${username}?token=${token}`);
-
-      socket.onmessage = (e) => {
-        const data = JSON.parse(e.data);
-        const seenText = data.seen ? "(seen)" : "(unread)";
-        const messageElement = `<div><strong>${data.from}:</strong> ${data.message} <em>${seenText}</em></div>`;
-        document.getElementById("chatBox").innerHTML += messageElement;
-      };
-    }
-
-    function send() {
-      const receiver = document.getElementById("receiver").value;
-      const message = document.getElementById("msg").value;
-      if (!socket || socket.readyState !== WebSocket.OPEN) return alert("WebSocket is not connected.");
-
-      socket.send(JSON.stringify({ receiver, message }));
-      document.getElementById("msg").value = "";
-    }
-
-    async function loadMessages() {
-      const receiver = document.getElementById("receiver").value;
-      if (!receiver) return alert("Please enter a receiver username.");
-
-      const res = await fetch(`http://localhost:8000/messages/${receiver}`, {
+    async function loadChats() {
+      const res = await fetch("http://localhost:8000/active_chats", {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
 
-      const messages = await res.json();
-      document.getElementById("chatBox").innerHTML = "";
+      if (!res.ok) {
+        alert("Failed to load chats.");
+        return;
+      }
 
-      messages.forEach(msg => {
-        const sender = msg.sender_id === username ? "You" : receiver;
-        const seenText = msg.seen ? "(seen)" : "(unread)";
-        const div = `<div><strong>${sender}:</strong> ${msg.content} <em>${seenText}</em></div>`;
-        document.getElementById("chatBox").innerHTML += div;
+      const users = await res.json();
+      const list = document.getElementById("chatList");
+      list.innerHTML = "";
+
+      users.forEach(user => {
+        const div = document.createElement("div");
+        div.className = "chat-item";
+        div.innerHTML = `<span>${user}</span>`;
+        div.onclick = () => {
+          window.location.href = `chatroom.html?user=${encodeURIComponent(user)}`;
+        };
+        list.appendChild(div);
       });
     }
+
+    function search() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      const items = document.querySelectorAll(".chat-item");
+
+      items.forEach(item => {
+        const username = item.innerText.toLowerCase();
+        item.style.display = username.includes(query) ? "block" : "none";
+      });
+    }
+
+    loadChats();
   </script>
 </body>
 </html>
