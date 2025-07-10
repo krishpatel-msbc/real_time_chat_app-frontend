@@ -140,55 +140,55 @@
   </div>
 
   <script>
-    if (localStorage.getItem("darkMode") === "true") {
-      document.body.classList.add("dark");
-    }
+  if (localStorage.getItem("darkMode") === "true") {
+    document.body.classList.add("dark");
+  }
 
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark");
-      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
-    }
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark");
+    localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  }
 
-    const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
-    async function loadChats() {
-      const res = await fetch("http://localhost:8000/active_chats", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (!res.ok) {
-        alert("Failed to load chats.");
-        return;
+  async function loadUsers() {
+    const res = await fetch("http://localhost:8000/users", {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
+    });
 
-      const users = await res.json();
-      const list = document.getElementById("chatList");
-      list.innerHTML = "";
-
-      users.forEach(user => {
-        const div = document.createElement("div");
-        div.className = "chat-item";
-        div.innerHTML = `<span>${user}</span>`;
-        div.onclick = () => {
-          window.location.href = `chatroom.html?user=${encodeURIComponent(user)}`;
-        };
-        list.appendChild(div);
-      });
+    if (!res.ok) {
+      alert("Failed to load users.");
+      return;
     }
 
-    function search() {
-      const query = document.getElementById("searchInput").value.toLowerCase();
-      const items = document.querySelectorAll(".chat-item");
+    const users = await res.json();
+    const list = document.getElementById("chatList");
+    list.innerHTML = "";
 
-      items.forEach(item => {
-        const username = item.innerText.toLowerCase();
-        item.style.display = username.includes(query) ? "block" : "none";
-      });
-    }
+    users.forEach(user => {
+      const div = document.createElement("div");
+      div.className = "chat-item";
+      div.innerHTML = `<span>${user.username}</span>`;
+      div.onclick = () => {
+        window.location.href = `chatroom.html?user=${encodeURIComponent(user.username)}`;
+      };
+      list.appendChild(div);
+    });
+  }
 
-    loadChats();
-  </script>
+  function search() {
+    const query = document.getElementById("searchInput").value.toLowerCase();
+    const items = document.querySelectorAll(".chat-item");
+
+    items.forEach(item => {
+      const username = item.innerText.toLowerCase();
+      item.style.display = username.includes(query) ? "block" : "none";
+    });
+  }
+
+  loadUsers();
+</script>
 </body>
 </html>
