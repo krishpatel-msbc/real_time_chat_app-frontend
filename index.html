@@ -3,32 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <title>Real-Time Chat - Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #dbeafe, #f3f4f6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
     .center-box {
-      width: 50vw;
-      height: 66vh;
-      margin: 5vh auto;
       background: white;
-      border-radius: 12px;
-      border: 2px solid #ccc;
-      padding: 30px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      padding: 40px 30px;
+      width: 90%;
+      max-width: 420px;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.8s ease-in-out;
     }
 
     .logo-title {
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 30px;
+      margin-bottom: 24px;
     }
 
     .logo-title img {
@@ -36,53 +42,95 @@
       margin-right: 12px;
     }
 
-    h1 {
-      margin: 0;
-      font-size: 24px;
+    .logo-title h1 {
+      font-size: 32px;
+      color: #111827;
+      text-shadow: 0 0 6px #00ffcc88;
+    }
+
+    .form-section {
+      margin-top: 10%;
+      text-align: center;
     }
 
     h2 {
-      margin-top: 40px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      color: #374151;
     }
 
     input {
-      width: 80%;
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 6px;
-      border: 1px solid #aaa;
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 8px #93c5fd;
+      outline: none;
     }
 
     button {
-      width: 84%;
+      width: 100px;
       padding: 10px;
-      margin: 6px 0;
-      border: none;
-      background-color: #4caf50;
+      margin: 6px;
+      font-size: 13px;
+      background: #10b981;
       color: white;
-      border-radius: 6px;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
+      transition: all 0.3s ease;
     }
 
     button:hover {
-      background-color: #45a049;
+      background: #059669;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .center-box {
+        padding: 30px 20px;
+      }
+
+      .logo-title h1 {
+        font-size: 24px;
+      }
+
+      button {
+        width: 90px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="center-box">
     <div class="logo-title">
-      <img src="your-logo.png" alt="Logo" />
+      <img src="https://toppng.com/uploads/preview/phone-icon-11549498584attf3ik674.png" alt="Logo" />
       <h1>Real-Time.com</h1>
     </div>
 
-    <h2>Login / Register</h2>
+    <div class="form-section">
+      <h2>Login / Register</h2>
 
-    <input id="username" placeholder="Username" />
-    <input id="password" placeholder="Password" type="password" />
-    <button onclick="login()">Login</button>
-    <button onclick="register()">Register</button>
+      <input id="username" placeholder="Username" />
+      <input id="password" placeholder="Password" type="password" />
+      <div style="display: flex; justify-content: center;">
+        <button onclick="login()">Login</button>
+        <button onclick="register()">Register</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -100,7 +148,7 @@
         token = data.access_token;
         localStorage.setItem("token", token);
         localStorage.setItem("username", username.value);
-        window.location.href = "chat.html"; // redirect to chat page
+        window.location.href = "chat.html";
       } else {
         alert("Login failed.");
       }
@@ -118,6 +166,8 @@
 
       if (res.ok) {
         alert("Registered successfully. Now login.");
+        username.value = "";
+        password.value = "";
       } else {
         alert("Registration failed.");
       }
